@@ -1,0 +1,9 @@
+## Architecture Recommendation
+
+For a fast-growing food delivery startup dealing with completely disparate data types (GPS logs, unstructured text reviews, structured payment transactions, and binary menu images), I highly recommend a **Data Lakehouse** architecture (such as Databricks Delta Lake or Apache Hudi).
+
+Here are 3 specific reasons for this recommendation:
+
+1. **Multimodal Data Support:** A standard Data Warehouse is explicitly designed to handle highly structured, relational data (like payment transactions). It cannot efficiently store or process unstructured blobs like restaurant menu images. A Data Lakehouse, however, is built directly on top of cheap object storage (like AWS S3) which can natively hold images, raw text reviews, and massive JSON GPS streams seamlessly without pre-defining a strict schema.
+2. **ACID Transactions on the Lake:** While a traditional Data Lake can store diverse data, it usually suffers from data "swamping"—it lacks the ability to reliably UPDATE or DELETE records without rewriting entire partitions. A Data Lakehouse bridges this gap by adding a metadata layer that supports ACID transactional guarantees. If a customer requests their payment data and GPS history to be deleted (e.g., for GDPR compliance), the Lakehouse engine can reliably execute the DELETE operation without corrupting the historical data pool.
+3. **Decoupled Compute and Storage Scalability:** GPS locations generate incredibly high-throughput, high-volume data streams. A Lakehouse strictly decouples the storage layer from the compute layer. The startup can ingest terabytes of GPS pings cheaply into object storage, and only spin up powerful compute clusters when the Data Science team explicitly needs to query the data to optimize delivery routes, drastically reducing operational costs compared to an always-on Data Warehouse.
